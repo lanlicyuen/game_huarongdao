@@ -47,16 +47,16 @@ done
 # 测试数据库连接
 echo ""
 echo "💾 测试数据库连接..."
-if docker exec -it huarongdao_postgres pg_isready -U admin.lanlic -d game_huaroingdao > /dev/null 2>&1; then
+if docker exec -it huarongdao_postgres pg_isready -U admin.lanlic -d game_huarongdao > /dev/null 2>&1; then
     echo "✅ PostgreSQL数据库连接正常"
     
     # 检查表是否存在
-    table_count=$(docker exec huarongdao_postgres psql -U admin.lanlic -d game_huaroingdao -t -c "SELECT count(*) FROM information_schema.tables WHERE table_schema='public';" 2>/dev/null | tr -d ' \n' || echo "0")
+    table_count=$(docker exec huarongdao_postgres psql -U admin.lanlic -d game_huarongdao -t -c "SELECT count(*) FROM information_schema.tables WHERE table_schema='public';" 2>/dev/null | tr -d ' \n' || echo "0")
     echo "   数据库表数量: $table_count"
     
     if [ "$table_count" -gt 0 ]; then
         echo "   数据库表列表:"
-        docker exec huarongdao_postgres psql -U admin.lanlic -d game_huaroingdao -c "\dt" 2>/dev/null | grep "public" || echo "   无法获取表列表"
+        docker exec huarongdao_postgres psql -U admin.lanlic -d game_huarongdao -c "\dt" 2>/dev/null | grep "public" || echo "   无法获取表列表"
     fi
 else
     echo "❌ PostgreSQL数据库连接失败"

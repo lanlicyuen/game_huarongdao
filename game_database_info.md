@@ -7,15 +7,15 @@
 - **端口**: 5432
 - **超级用户**: admin.lanlic
 - **密码**: 98605831aAqQ
-- **游戏数据库名**: game_huaroingdao
+- **游戏数据库名**: game_huarongdao
 
 ## 连接方式
 ```bash
 # Docker容器连接
-docker exec -it postgres psql -U admin.lanlic -d game_huaroingdao
+docker exec -it postgres psql -U admin.lanlic -d game_huarongdao
 
 # 外部连接字符串
-postgresql://admin.lanlic:98605831aAqQ@localhost:5432/game_huaroingdao
+postgresql://admin.lanlic:98605831aAqQ@localhost:5432/game_huarongdao
 ```
 
 ## 数据库表结构

@@ -182,7 +182,7 @@ services:
     environment:
       POSTGRES_USER: admin.lanlic
       POSTGRES_PASSWORD: 98605831aAqQ
-      POSTGRES_DB: game_huaroingdao
+      POSTGRES_DB: game_huarongdao
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./server/db/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -193,7 +193,7 @@ services:
     build: ./server
     container_name: huarongdao_api
     environment:
-      DATABASE_URL: postgresql://admin.lanlic:98605831aAqQ@postgres:5432/game_huaroingdao
+      DATABASE_URL: postgresql://admin.lanlic:98605831aAqQ@postgres:5432/game_huarongdao
       PORT: 3000
     ports:
       - "3000:3000"

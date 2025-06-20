@@ -28,7 +28,7 @@
 - **游戏访问地址**: http://localhost:6001/
 - **外部访问地址**: http://1.1.1.12:6001/
 - **数据库端口**: 5433
-- **数据库名**: game_huaroingdao
+- **数据库名**: game_huarongdao
 - **数据库用户**: admin.lanlic
 
 ## 端口冲突解决方案

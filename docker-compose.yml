@@ -6,7 +6,7 @@ services:
     container_name: huarongdao_postgres
     restart: always
     environment:
-      POSTGRES_DB: game_huaroingdao
+      POSTGRES_DB: game_huarongdao
       POSTGRES_USER: admin.lanlic
       POSTGRES_PASSWORD: 98605831aAqQ
     volumes:
@@ -15,7 +15,7 @@ services:
     ports:
       - "127.0.0.1:5433:5432"  # 避免端口冲突
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin.lanlic -d game_huaroingdao"]
+      test: ["CMD-SHELL", "pg_isready -U admin.lanlic -d game_huarongdao"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -30,7 +30,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      - DATABASE_URL=postgresql://admin.lanlic:98605831aAqQ@postgres:5432/game_huaroingdao
+      - DATABASE_URL=postgresql://admin.lanlic:98605831aAqQ@postgres:5432/game_huarongdao
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health"]
       interval: 30s

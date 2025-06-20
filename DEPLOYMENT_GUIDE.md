@@ -74,7 +74,7 @@ docker-compose logs -f
 #### 3. 数据库连接测试
 ```bash
 # 连接PostgreSQL
-docker exec -it huarongdao_postgres psql -U admin.lanlic -d game_huaroingdao
+docker exec -it huarongdao_postgres psql -U admin.lanlic -d game_huarongdao
 
 # 查看表结构
 \dt

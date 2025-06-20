@@ -2,7 +2,7 @@
 -- 创建日期: 2025年6月18日
 
 -- 确保连接到正确的数据库
-\c game_huaroingdao;
+\c game_huarongdao;
 
 -- 创建用户表 (与你之前准备的表结构一致)
 CREATE TABLE IF NOT EXISTS game_users (
