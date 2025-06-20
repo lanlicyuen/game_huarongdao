@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>华容道 - Giiker风格</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>华容道</h1>            <div class="game-info">
+                <div class="level">关卡: <span id="current-level">1</span></div>
+                <div class="moves">步数: <span id="move-count">0</span></div>
+                <div class="timer">时间: <span id="timer">00:00</span></div>
+                <div class="user">用户: <span id="current-user">游客</span></div>
+            </div>
+        </div>          <div class="control-panel">
+            <button id="prev-level" class="btn">上一关</button>
+            <button id="reset" class="btn">重置</button>
+            <button id="next-level" class="btn">下一关</button>
+            <button id="hint" class="btn">提示</button>
+            <button id="toggle-zoom" class="btn zoom-btn">🔍 放大</button>
+            <button id="account-btn" class="btn account-btn">账号管理</button>
+        </div>
+        
+        <div class="game-board-wrapper" id="game-board-wrapper">
+            <div class="game-board" id="game-board">
+                <!-- 游戏板块将通过JavaScript动态生成 -->
+            </div>
+        </div>
+        
+        <div class="level-selector">
+            <h3>选择关卡 (难度1-10级)</h3>
+            <div class="levels">
+                <button class="level-btn active" data-level="1">1级</button>
+                <button class="level-btn" data-level="2">2级</button>
+                <button class="level-btn" data-level="3">3级</button>
+                <button class="level-btn" data-level="4">4级</button>
+                <button class="level-btn" data-level="5">5级</button>
+                <button class="level-btn" data-level="6">6级</button>
+                <button class="level-btn" data-level="7">7级</button>
+                <button class="level-btn" data-level="8">8级</button>
+                <button class="level-btn" data-level="9">9级</button>
+                <button class="level-btn" data-level="10">10级</button>
+            </div>
+        </div>
+          <div class="instructions">
+            <h3>游戏说明</h3>
+            <p>🎯 目标：将红色的曹操方块移动到底部出口</p>
+            <p>🎮 操作：点击方块移动到空位</p>
+            <p>📈 难度：从1级到10级逐渐增加</p>
+            <p>🏆 挑战：用最少步数完成关卡</p>
+            <div class="admin-controls">
+                <button id="validate-all-btn" class="btn admin-btn">验证所有关卡</button>
+            </div>
+        </div>
+    </div>
+      <div id="victory-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>🎉 恭喜过关！</h2>
+            <p>关卡 <span id="victory-level"></span> 完成</p>
+            <p>用时: <span id="victory-time"></span></p>
+            <p>步数: <span id="victory-moves"></span></p>
+            <div class="modal-buttons">
+                <button id="next-level-modal" class="btn">下一关</button>
+                <button id="replay-level" class="btn">重玩</button>
+                <button id="close-modal" class="btn">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 账号管理弹窗 -->
+    <div id="account-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>👤 账号管理</h2>
+            <div id="guest-view" class="account-section">
+                <p>当前以游客身份游玩</p>
+                <div class="modal-buttons">
+                    <button id="login-btn" class="btn">登录账号</button>
+                    <button id="register-btn" class="btn">注册账号</button>
+                    <button id="close-account-modal" class="btn">关闭</button>
+                </div>
+            </div>
+            
+            <div id="login-view" class="account-section hidden">
+                <div class="form-group">
+                    <label for="login-username">用户名:</label>
+                    <input type="text" id="login-username" placeholder="请输入用户名" maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">密码:</label>
+                    <input type="password" id="login-password" placeholder="请输入密码">
+                </div>
+                <div class="modal-buttons">
+                    <button id="do-login" class="btn primary">登录</button>
+                    <button id="back-to-guest" class="btn">返回</button>
+                </div>
+            </div>
+            
+            <div id="register-view" class="account-section hidden">
+                <div class="form-group">
+                    <label for="reg-username">用户名:</label>
+                    <input type="text" id="reg-username" placeholder="请输入用户名 (3-50字符)" maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">密码:</label>
+                    <input type="password" id="reg-password" placeholder="请输入密码 (6位以上)">
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">邮箱 (可选):</label>
+                    <input type="email" id="reg-email" placeholder="请输入邮箱地址" maxlength="100">
+                </div>
+                <div class="modal-buttons">
+                    <button id="do-register" class="btn primary">注册</button>
+                    <button id="back-to-guest-reg" class="btn">返回</button>
+                </div>
+            </div>
+            
+            <div id="user-view" class="account-section hidden">
+                <p>欢迎回来，<span id="username-display"></span>！</p>
+                <p>注册时间: <span id="register-time"></span></p>
+                <p>最后登录: <span id="last-login-time"></span></p>
+                <div class="progress-actions">
+                    <button id="save-progress" class="btn primary">保存进度</button>
+                    <button id="load-progress" class="btn">加载进度</button>
+                </div>
+                <div class="modal-buttons">
+                    <button id="logout-btn" class="btn">退出登录</button>
+                    <button id="delete-account" class="btn danger">删除账号</button>
+                    <button id="close-user-modal" class="btn">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 确认删除账号弹窗 -->
+    <div id="delete-confirm-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>⚠️ 删除账号确认</h2>
+            <p>您确定要删除账号吗？此操作不可恢复！</p>
+            <p>所有游戏进度将被永久删除。</p>
+            <div class="modal-buttons">
+                <button id="confirm-delete" class="btn danger">确认删除</button>
+                <button id="cancel-delete" class="btn">取消</button>
+            </div>        </div>
+    </div>
+      <!-- 版权信息 -->
+    <div class="footer">
+        <div class="copyright">
+            <p><strong>华容道游戏 v1.0</strong></p>
+            <p>© 2025 1PLab - 一人实验室</p>
+            <p>技术支持：Docker容器化部署 | PostgreSQL数据库</p>
+            <p>访问地址：<span id="current-url">http://1.1.1.12:6001</span></p>
+        </div>
+    </div>
+      <script src="database.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

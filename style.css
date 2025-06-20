@@ -1,0 +1,852 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+    color: #333;
+    /* 手机全屏优化 */
+    width: 100vw;
+    overflow-x: hidden;
+}
+
+.game-container {
+    max-width: 100%;
+    margin: 0;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 0;
+    padding: 10px;
+    box-shadow: none;
+    min-height: 100vh;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 2.5em;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-around;
+    background: #34495e;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.control-panel {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #3498db;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.btn:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.game-board {
+    width: 400px;
+    height: 500px;
+    margin: 0 auto 20px;
+    background: #2c3e50;
+    border-radius: 15px;
+    padding: 15px;
+    position: relative;
+    box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+    border: 5px solid #34495e;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    /* PC端确保方块不会溢出 */
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.piece {
+    position: absolute;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    touch-action: none;
+}
+
+.piece:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.piece:active {
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+}
+
+.piece:not(.moving):hover {
+    cursor: grab;
+    cursor: -webkit-grab;
+}
+
+.piece.moving {
+    z-index: 100;
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    transition: none; /* 禁用过渡以确保流畅拖拽 */
+}
+
+/* 曹操 - 红色大块 */
+.piece.caocao {
+    background: linear-gradient(45deg, #e74c3c, #c0392b);
+    font-size: 18px;
+}
+
+/* 武将 - 蓝色竖块 */
+.piece.general {
+    background: linear-gradient(45deg, #3498db, #2980b9);
+    font-size: 16px;
+}
+
+/* 兵卒 - 黄色小块 */
+.piece.soldier {
+    background: linear-gradient(45deg, #f1c40f, #f39c12);
+    font-size: 14px;
+}
+
+.grid-cell {
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.exit-zone {
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 190px;
+    height: 20px;
+    background: linear-gradient(90deg, #27ae60, #2ecc71);
+    border-radius: 10px;
+    border: 2px solid #27ae60;
+    box-shadow: 0 0 15px rgba(39, 174, 96, 0.5);
+}
+
+.level-selector {
+    margin-bottom: 20px;
+}
+
+.level-selector h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.levels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.level-btn {
+    padding: 8px 15px;
+    border: 2px solid #3498db;
+    background: white;
+    color: #3498db;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    min-width: 50px;
+}
+
+.level-btn:hover {
+    background: #3498db;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.level-btn.active {
+    background: #3498db;
+    color: white;
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+.level-btn.completed {
+    background: #27ae60;
+    border-color: #27ae60;
+    color: white;
+}
+
+.instructions {
+    background: #ecf0f1;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.instructions h3 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.instructions p {
+    margin: 8px 0;
+    color: #34495e;
+    line-height: 1.6;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 400px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+    color: #27ae60;
+    margin-bottom: 20px;
+    font-size: 2em;
+}
+
+.modal-content p {
+    margin: 10px 0;
+    color: #2c3e50;
+    font-size: 1.1em;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.hint-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(241, 196, 15, 0.3);
+    border-radius: 8px;
+    border: 3px solid #f1c40f;
+    animation: pulse 1s infinite;
+    pointer-events: none;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.3; }
+}
+
+/* 响应式设计 - PC端优化 */
+@media (min-width: 769px) {
+    .game-board {
+        width: 400px;
+        height: 500px;
+        padding: 15px;
+        /* 确保PC端方块尺寸精确 */
+        box-sizing: border-box;
+    }
+    
+    .piece {
+        /* PC端方块样式微调 */
+        box-sizing: border-box;
+    }
+}
+
+/* 响应式设计 - 移动端优化 */
+@media (max-width: 768px) {
+    body {
+        padding: 0;
+    }
+    
+    .game-container {
+        padding: 5px;
+        border-radius: 0;
+        min-height: 100vh;
+    }
+    
+    .header h1 {
+        font-size: 2em;
+        margin-bottom: 10px;
+    }
+    
+    .game-board {
+        width: 100%;
+        max-width: 380px;
+        margin: 0 auto 15px;
+        padding: 10px;
+        height: auto;
+        /* 确保方块宽度计算正确 */
+        position: relative;
+    }
+    
+    .piece {
+        font-size: 12px;
+        border-radius: 6px;
+        border-width: 2px;
+    }
+    
+    .levels {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        max-width: 380px;
+        margin: 0 auto;
+    }
+    
+    .level-btn {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    
+    .game-info {
+        flex-direction: row;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 5px;
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .control-panel {
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+    
+    .btn {
+        padding: 8px 12px;
+        font-size: 12px;
+        flex: 1;
+        min-width: 70px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 0;
+        font-size: 14px;
+    }
+    
+    .game-container {
+        padding: 5px;
+        min-height: 100vh;
+    }
+      .header h1 {
+        font-size: 1.8em;
+        margin-bottom: 8px;
+    }
+    
+    .game-board {
+        width: calc(100vw - 10px);
+        max-width: 350px;
+        height: 300px;
+        margin: 0 auto 10px;
+        padding: 8px;
+        /* 保持原有的背景和边框样式 */
+        background: #2c3e50;
+        border-radius: 15px;
+        border: 5px solid #34495e;
+        box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+        /* 重要：确保方块尺寸计算正确 */
+        box-sizing: border-box;
+    }
+    
+    .control-panel {
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: 10px;
+    }
+    
+    .btn {
+        padding: 6px 8px;
+        font-size: 11px;
+        flex: 1;
+        min-width: 60px;
+    }
+    
+    .levels {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 4px;
+        max-width: 350px;
+        margin: 0 auto;
+    }
+    
+    .level-btn {
+        padding: 6px 4px;
+        font-size: 11px;
+    }
+    
+    .piece {
+        font-size: 10px;
+        border-width: 1px;
+        /* 重要：确保所有方块使用相同的计算方式 */
+        box-sizing: border-box;
+    }
+    
+    .game-info {
+        gap: 3px;
+        font-size: 11px;
+        padding: 6px;
+    }
+    
+    .instructions {
+        margin-top: 10px;
+    }
+    
+    .instructions h3 {
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+    
+    .instructions p {
+        font-size: 11px;
+        margin: 3px 0;
+    }
+    
+    .modal-content {
+        width: 95%;
+        max-width: 320px;
+        padding: 15px;
+    }
+}
+
+/* 拖拽相关样式 */
+.piece {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    touch-action: none;
+}
+
+.piece:active {
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+}
+
+.piece:not(.moving):hover {
+    cursor: grab;
+    cursor: -webkit-grab;
+}
+
+.piece.moving {
+    z-index: 100;
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    transition: none; /* 禁用过渡以确保流畅拖拽 */
+}
+
+/* 阻止文本选择和右键菜单 */
+.game-board {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+    .piece {
+        transition: transform 0.1s ease;
+    }
+    
+    .piece:active {
+        transform: scale(1.05);
+    }
+}
+
+.admin-controls {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.admin-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.admin-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.admin-btn:active {
+    transform: translateY(0);
+}
+
+/* 账号管理样式 */
+.account-btn {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.account-btn:hover {
+    background: linear-gradient(135deg, #218838 0%, #1fa080 100%);
+}
+
+.account-section {
+    padding: 20px 0;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.form-group input:invalid {
+    border-color: #dc3545;
+}
+
+.progress-actions {
+    margin: 15px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}
+
+.btn.primary {
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    color: white;
+}
+
+.btn.primary:hover {
+    background: linear-gradient(135deg, #357abd 0%, #2968a3 100%);
+}
+
+.btn.danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+}
+
+.btn.danger:hover {
+    background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+}
+
+.user-info {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #e8f5e8;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* 状态指示器 */
+.status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-indicator.online {
+    background-color: #28a745;
+}
+
+.status-indicator.offline {
+    background-color: #6c757d;
+}
+
+/* 移动端表单优化 */
+@media (max-width: 480px) {
+    .form-group input {
+        font-size: 16px; /* 防止iOS缩放 */
+    }
+    
+    .modal-content {
+        padding: 15px;
+    }
+    
+    .progress-actions {
+        padding: 10px;
+    }
+}
+
+/* 移动端检测样式 - 替换之前的mobile-version样式 */
+body.mobile-detected {
+    /* 确保移动端基础样式 */
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+body.mobile-detected .game-container {
+    padding: 5px;
+    border-radius: 0;
+    min-height: 100vh;
+}
+
+body.mobile-detected .header h1 {
+    font-size: 1.8em;
+    margin-bottom: 10px;
+}
+
+body.mobile-detected .btn {
+    padding: 8px 12px;
+    font-size: 12px;
+    flex: 1;
+    min-width: 70px;
+}
+
+body.mobile-detected .piece {
+    font-size: 12px;
+    border-radius: 6px;
+    border-width: 2px;
+}
+
+/* 真实移动设备的特殊处理 */
+body.mobile-device .game-board {
+    width: calc(100vw - 20px) !important;
+    max-width: 380px !important;
+    /* FIX: Use aspect-ratio to maintain board proportions, preventing layout collapse. */
+    aspect-ratio: 4 / 5;
+    height: auto; /* Let aspect-ratio control the height */
+    margin: 0 auto 15px !important;
+    padding: 10px !important;
+    /* 重要：确保方块不会浮动错位 */
+    position: relative !important;
+    box-sizing: border-box !important;
+}
+
+/* m.域名访问的处理 */
+body.mobile-domain .game-board {
+    width: 100% !important;
+    max-width: 400px !important;
+    height: 500px !important;
+    margin: 0 auto 20px !important;
+    padding: 15px !important;
+}
+
+/* 桌面端确保正常显示 */
+body.desktop-detected .game-board {
+    width: 400px;
+    height: 500px;
+    padding: 15px;
+}
+
+/* 版权信息样式 */
+.footer {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(52, 73, 94, 0.9);
+    color: white;
+    text-align: center;
+    border-radius: 10px 10px 0 0;
+}
+
+.copyright {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.copyright p {
+    margin: 5px 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.copyright p:first-child {
+    font-size: 16px;
+    font-weight: bold;
+    color: #3498db;
+    margin-bottom: 10px;
+}
+
+#current-url {
+    color: #2ecc71;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+/* 手机端版权信息优化 */
+@media (max-width: 480px) {
+    .footer {
+        margin-top: 20px;
+        padding: 15px 10px;
+        border-radius: 0;
+    }
+    
+    .copyright p {
+        font-size: 12px;
+        margin: 3px 0;
+    }
+    
+    .copyright p:first-child {
+        font-size: 14px;
+    }
+    
+    #current-url {
+        font-size: 11px;
+        word-break: break-all;
+    }
+}
+
+.btn.zoom-btn {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    font-weight: bold;
+    font-size: 14px;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+.btn.zoom-btn:hover {
+    background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+/* 控制面板响应式优化 */
+.control-panel {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .control-panel {
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+    
+    .control-panel .btn {
+        padding: 8px 10px;
+        font-size: 12px;
+        min-width: 60px;
+        flex: 1;
+        max-width: 80px;
+    }
+    
+    .btn.zoom-btn {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        font-weight: bold;
+        order: -1; /* 让放大按钮排在前面 */
+        flex: 1.2; /* 让放大按钮稍微大一点 */
+        max-width: 90px;
+    }
+}
+
+@media (max-width: 480px) {
+    .control-panel {
+        gap: 3px;
+        margin-bottom: 10px;
+    }
+    
+    .control-panel .btn {
+        padding: 6px 8px;
+        font-size: 11px;
+        min-width: 50px;
+        flex: 1;
+        max-width: 70px;
+    }
+    
+    .btn.zoom-btn {
+        order: -1;
+        flex: 1.3;
+        max-width: 75px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+}

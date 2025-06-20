@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>华容道关卡验证测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .valid {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .invalid {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔍 华容道关卡验证测试</h1>
+        <p>这个页面用于测试所有关卡的有效性，确保每个关卡都可以正常游戏。</p>
+        
+        <button onclick="runValidation()">开始验证所有关卡</button>
+        <button onclick="runDetailedValidation()">详细验证报告</button>
+        <button onclick="clearResults()">清除结果</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        let gameInstance = null;
+        
+        function initGame() {
+            if (!gameInstance) {
+                // 创建一个临时的游戏容器
+                const tempContainer = document.createElement('div');
+                tempContainer.style.display = 'none';
+                tempContainer.innerHTML = `
+                    <div id="game-board"></div>
+                    <div id="current-level">1</div>
+                    <div id="move-count">0</div>
+                    <div id="timer">00:00</div>
+                `;
+                document.body.appendChild(tempContainer);
+                
+                gameInstance = new HuaRongDao();
+            }
+            return gameInstance;
+        }
+        
+        function runValidation() {
+            const game = initGame();
+            const results = game.validateAllLevels();
+            displayResults(results);
+        }
+        
+        function runDetailedValidation() {
+            const game = initGame();
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h3>详细验证报告</h3>';
+            
+            console.log('开始详细验证...');
+            
+            for (let level = 1; level <= 10; level++) {
+                const levelData = game.levels[level];
+                const isValid = game.validateLevel(levelData);
+                const emptyCells = game.getEmptyCellsCount(levelData);
+                
+                // 创建详细的分析报告
+                const analysis = analyzeLevel(levelData, game.gridSize);
+                
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `test-result ${isValid ? 'valid' : 'invalid'}`;
+                resultDiv.innerHTML = `
+                    <strong>关卡 ${level}:</strong> ${isValid ? '✓ 有效' : '✗ 无效'}<br>
+                    <strong>空位数量:</strong> ${emptyCells}<br>
+                    <strong>棋子数量:</strong> ${levelData.pieces.length}<br>
+                    <strong>布局分析:</strong> ${analysis}
+                `;
+                
+                resultsDiv.appendChild(resultDiv);
+            }
+            
+            // 添加总结
+            const validCount = game.validateAllLevels().filter(r => r.valid).length;
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'summary';
+            summaryDiv.innerHTML = `
+                <h4>验证总结</h4>
+                <p>✅ 有效关卡: ${validCount}/10</p>
+                <p>❌ 无效关卡: ${10 - validCount}/10</p>
+                <p>通过率: ${(validCount * 10).toFixed(1)}%</p>
+            `;
+            resultsDiv.appendChild(summaryDiv);
+        }
+        
+        function analyzeLevel(levelData, gridSize) {
+            const totalCells = gridSize.width * gridSize.height;
+            let occupiedCells = 0;
+            const pieceTypes = {};
+            
+            levelData.pieces.forEach(piece => {
+                occupiedCells += piece.width * piece.height;
+                pieceTypes[piece.type] = (pieceTypes[piece.type] || 0) + 1;
+            });
+            
+            const emptyCells = totalCells - occupiedCells;
+            const density = ((occupiedCells / totalCells) * 100).toFixed(1);
+            
+            return `密度${density}%, 棋子类型: ${JSON.stringify(pieceTypes)}`;
+        }
+        
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h3>快速验证结果</h3>';
+            
+            results.forEach(result => {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `test-result ${result.valid ? 'valid' : 'invalid'}`;
+                resultDiv.textContent = `关卡 ${result.level}: ${result.valid ? '✓ 有效' : '✗ 无效'} (空位: ${result.emptyCells})`;
+                resultsDiv.appendChild(resultDiv);
+            });
+            
+            const validCount = results.filter(r => r.valid).length;
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'summary';
+            summaryDiv.textContent = `验证完成: ${validCount}/10 个关卡有效`;
+            resultsDiv.appendChild(summaryDiv);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        // 页面加载完成后自动运行一次快速验证
+        window.addEventListener('load', () => {
+            setTimeout(runValidation, 1000);
+        });
+    </script>
+</body>
+</html>
